@@ -7,6 +7,7 @@
 import unittest
 
 from smartbotsol import smartbotsol
+from smartbotsol import telegram as tlm
 
 
 class TestSmartbotsol(unittest.TestCase):
