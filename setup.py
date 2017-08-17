@@ -13,6 +13,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     # TODO: put package requirements here
+    'python-telegram-bot==7.0.1',
 ]
 
 setup_requirements = [
