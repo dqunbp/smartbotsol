@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 
 import logging as logger
 from telegram.ext import Handler, Updater, MessageHandler, Filters, CommandHandler, CallbackQueryHandler

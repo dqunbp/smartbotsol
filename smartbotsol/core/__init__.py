@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 # from .trigger import BaseTrigger
 # from .statemachine import StateMachine

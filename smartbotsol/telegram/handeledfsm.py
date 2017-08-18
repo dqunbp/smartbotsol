@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from smartbotsol import StateMachine
 
 import logging as logger

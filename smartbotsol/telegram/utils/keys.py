@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 class KeysNav(object):
     def __init__(self, items, offset=None, show_N_objs=None, back_string='Назад', show_back=True):

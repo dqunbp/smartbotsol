@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import copy
 from functools import wraps
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
