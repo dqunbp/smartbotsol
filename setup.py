@@ -24,6 +24,8 @@ test_requirements = [
     # TODO: put package test requirements here
 ]
 
+packages = find_packages(exclude=['tests*'])
+
 setup(
     name='smartbotsol',
     version='0.1.0',
@@ -32,7 +34,7 @@ setup(
     author="Tigran Grigoryan",
     author_email='dqunbp@gmail.com',
     url='https://github.com/dqunbp/smartbotsol',
-    packages=find_packages(include=['smartbotsol']),
+    packages=packages,
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
