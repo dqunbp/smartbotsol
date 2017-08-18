@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 from .core.statemachine import StateMachine
 from .core.filter import Filter
 from .core.state import BaseState
@@ -9,4 +9,4 @@ __author__ = """Tigran Grigoryan"""
 __email__ = 'dqunbp@gmail.com'
 __version__ = '0.1.0'
 
-__all__ = ("StateMachine", "Filter", "BaseState", "BaseTrigger")
+__all__ = ["StateMachine", "Filter", "BaseState", "BaseTrigger"]

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 from .telegramtrigger import TelegramTrigger
 from .handeledfsm import HandeledStateMachine
 
