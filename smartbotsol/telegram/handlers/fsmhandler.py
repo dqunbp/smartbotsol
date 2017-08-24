@@ -3,7 +3,7 @@
 
 import logging as logger
 from telegram.ext import Handler, Updater, MessageHandler, Filters, CommandHandler, CallbackQueryHandler
-from smartbotsol.utils.helpers import extract_chat_and_user
+from smartbotsol.telegram.utils.helpers import extract_chat_and_user
 from smartbotsol.telegram import TelegramTrigger
 
 from telegram import Update
