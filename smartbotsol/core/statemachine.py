@@ -14,6 +14,7 @@ class StateMachine(object):
         self.filters = filters
 
     def fire(self, trigger):
+        self.state = trigger.user.state
         for f in self.filters:
             filtered_state = f._on_process(self.state, trigger)
             if filtered_state:

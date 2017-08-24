@@ -7,14 +7,17 @@ from smartbotsol.utils.helpers import extract_chat_and_user
 from smartbotsol.telegram import TelegramTrigger
 
 from telegram import Update
+from smartbotsol import DictCache
 
 class fsmTelegramHandler(Handler):
 
     def __init__(self, users_store, state_machine, trigger=TelegramTrigger()):
-        self.users_store = users_store
+        self.users_cache = DictCache()
         self.state_machine = state_machine
         self.trigger = trigger
 
+    def set_users_cache(self, store):
+        pass
 
     def check_update(self, update):
         if not isinstance(update, Update):
@@ -25,7 +28,7 @@ class fsmTelegramHandler(Handler):
 
         chat, usr = extract_chat_and_user(update)
         key = (chat.id, usr.id) if chat else (None, usr.id)
-        user = self.users_store.get(key)
+        user = self.users_cache.get(key)
 
         #wraper for telegram methods
         trigger = self.trigger
