@@ -1,4 +1,4 @@
-from state import BaseState
+from smartbotsol import BaseState
 
 class User(object):
     def __init__(self, uid):
