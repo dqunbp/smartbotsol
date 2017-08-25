@@ -9,10 +9,10 @@ from smartbotsol.telegram import TelegramTrigger
 from telegram import Update
 from smartbotsol import DictCache
 
-class fsmTelegramHandler(Handler):
+class FsmTelegramHandler(Handler):
 
-    def __init__(self, users_store, state_machine, trigger=TelegramTrigger()):
-        self.users_cache = DictCache()
+    def __init__(self, state_machine, users_cache=DictCache(), trigger=TelegramTrigger()):
+        self.users_cache = users_cache
         self.state_machine = state_machine
         self.trigger = trigger
 

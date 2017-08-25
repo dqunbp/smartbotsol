@@ -14,16 +14,14 @@ class DictCache(Cache):
     BACKUP_DIR_PATH = '~/states_backup'
 
     def get(self, uid):
-        user = self._cache.get(uid)
-
-        if not user:
-            user = User(uid)
-            self._cache[uid] = user
-
-        return self._cache.get(uid)
+        return self._cache.setdefault(uid, User(uid))
 
     def add(self, key, value):
-        assert isinstance(value, User)
+        try:
+            assert isinstance(value, User)
+        except AssertionError as e:
+            log.warn(e)
+            log.warn('User with id %s, is %s instance, it must be User instance, skip...' % (k, v.__class__.__name__))
         self._cache[key] = value
 
     def to_dict(self):
@@ -32,10 +30,10 @@ class DictCache(Cache):
     def from_dict(self, fdict):
         assert isinstance(fdict, dict)
         for k,v in fdict.iteritems():
-            if isinstance(v, User):
-                self._cache.setdefault(k,v)
-            else:
-                log.warn('User with id %s, is %s instance, it must be User instance, skip...' % (k, v.__class__.__name__))
+            if not k == v.uid:
+                log.warn('User id must be equals store key %s != %s, skip...' % (k, v.uid))
+                continue
+            self.add(k,v)
 
     def save(self):
         """Save users cache to file"""
@@ -44,9 +42,10 @@ class DictCache(Cache):
             os.makedirs(path)
 
         with open(path, 'wb') as f:
-            dill.dump(len(self._cache.keys()), f)
-            for user_key in self._cache.keys():
-                dill.dump(self._cache[user_key], f)
+            dill.dump(self._cache.keys(), f)
+            # dill.dump(len(self._cache.keys()), f)
+            # for user_key in self._cache.keys():
+            #     dill.dump(self._cache[user_key], f)
             log.debug('All states saved to {}.'.format(path))
 
     def load(self):
@@ -54,11 +53,12 @@ class DictCache(Cache):
         path = os.path.join(DictCache.BACKUP_DIR_PATH, DictCache.FILE_NAME)
         try:
             with open(path, 'rb') as f:
-                log.debug(str(self._cache))
-                for i in range(dill.load(f)):
-                    user = dill.load(f)
-                    self._cache[user.uid] = user
+                self._cache.update(dill.load(f))
+                # # log.debug(str(self._cache))
+                # for i in range(dill.load(f)):
+                #     user = dill.load(f)
+                #     self._cache[user.uid] = user
                 log.debug('All states have been loaded from {}.'.format(path))
-                log.debug(str(self._cache))
+                # log.debug(str(self._cache))
         except OSError as e:
             log.debug('User_states file isn`t exist! {}'.format(e))

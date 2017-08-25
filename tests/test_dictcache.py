@@ -16,17 +16,27 @@ class TestSmartbotsol(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures, if any."""
         self.dump_path = './backups'
-        self.user_uids = [111,222,333]
-        self.dict_cache = { x: User(x) for x in self.user_uids }
+        # self.test_user = 123456
+        self.users_uids = [ 111,222,333 ]
+        self.dict_cache = { x: User(x) for x in self.users_uids }
+        import dill
+        self.dump = dill.dumps(self.dict_cache)
 
     def tearDown(self):
         """Tear down test fixtures, if any."""
 
-
     def test_get_user(self):
         """Test something."""
         cache = DictCache()
-        for u in self.user_uids:
+        for u in self.users_uids:
             cache.get(u)
+        for u in self.users_uids:
+            self.assertEqual(cache.get(u), User(u))
+
+    def test_to_dict(self):
+        """Test something."""
+        cache = DictCache()
         self.assertTrue(isinstance(cache.to_dict(), dict))
+        for u in self.users_uids:
+            cache.get(u)
         self.assertDictEqual(cache.to_dict(), self.dict_cache)
