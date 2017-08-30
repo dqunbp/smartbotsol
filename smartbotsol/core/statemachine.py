@@ -10,11 +10,13 @@ class StateMachine(object):
     """
 
     def __init__(self, init_state, filters):
-        self.state = init_state
+        self.init_state = init_state
         self.filters = filters
 
     def fire(self, trigger):
         self.state = trigger.user.state
+        if self.state is None:
+            self.state = self.init_state
         for f in self.filters:
             filtered_state = f._on_process(self.state, trigger)
             if filtered_state:
