@@ -31,14 +31,20 @@ class job_decorator(object):
 class putjob(object):
     # from telegram.ext import Job
     # from functools import wraps
-    def __init__(self, timeout, action):
+    def __init__(self, timeout, action_latency):
         self.timeout = timeout
+        self.latency = action_latency
     def __call__(self, fn):
-        log.debug('FUNC {} WAS CALLED'.format(fn))
+        log.debug('FUNC {} WAS CALLED'.format(fn.__name__))
         timeout = self.timeout
+        latency = self.latency
         @wraps(fn)
         def decorated(self, *args, **kwargs):
-            log.debug('FUNC {} WAS DECORATED'.format(fn))
+            log.debug('FUNC {} WAS DECORATED'.format(fn.__name__))
+            send_action_job = job_decorator(self)(self.bot.send_chat_action, chat_id=self.chat_id, action=fn.action)
+            self.job_queue.put(Job(send_action_job, timeout - latency, repeat=False))
+            # log.debug('SEND ACTION FOR {} WITH TIMEOUT {}'.format(fn.__name__, timeout))
+            # self.bot.send_chat_action(chat_id=self.chat_id, action=fn.action)
             telegram_job = job_decorator(self)(fn, *args, **kwargs)
             self.job_queue.put(Job(telegram_job, timeout, repeat=False))
             log.debug('PUTTED ARGS {}'.format([self, args, kwargs]))
@@ -141,7 +147,7 @@ class TelegramTrigger(BaseTrigger):
         return self.bot.sendPhoto(chat_id=self.chat_id, photo=src)
 
     # @classmethod
-    def putjob(self, timeout, **kwargs):
+    def putjob(self, timeout, latency=1, **kwargs):
         # enumeration trigger functions
         testcls = self.__class__()
         testcls.update = self.update
@@ -154,9 +160,9 @@ class TelegramTrigger(BaseTrigger):
             # if function has action attr decorate them
             if callable(func) and hasattr(func, 'action'):
                 action = getattr(func, 'action')
-                self.bot.send_chat_action(chat_id=self.chat_id, action=action)
+                # self.bot.send_chat_action(chat_id=self.chat_id, action=action)
                 # decorate function
-                func = putjob(timeout, action)(func)
+                func = putjob(timeout, latency)(func)
                 setattr(self, attr, types.MethodType(func, self))
                 # log.debug('DECORATE {}, ACTION {}, TIMEOUT {}, DECORATED {}'.format(attr, action, timeout,func))
         return self
