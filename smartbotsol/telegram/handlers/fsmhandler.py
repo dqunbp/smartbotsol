@@ -35,5 +35,6 @@ class FsmTelegramHandler(Handler):
         trigger.bot = dispatcher.bot
         trigger.user = user
         trigger.update = update
+        trigger.job_queue = dispatcher.job_queue
         
         self.state_machine.fire(trigger)
