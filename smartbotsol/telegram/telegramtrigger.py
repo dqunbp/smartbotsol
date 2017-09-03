@@ -12,8 +12,8 @@ from smartbotsol import BaseTrigger
 
 import types
 import copy
-# from telegram.ext import Job
-# from functools import wraps
+from telegram.ext import Job
+from functools import wraps
 
 TYPING, UPLOAD_PHOTO = (ChatAction.TYPING, ChatAction.UPLOAD_PHOTO)
 
@@ -29,17 +29,22 @@ class job_decorator(object):
         return telegram_job
 
 class putjob(object):
-    from telegram.ext import Job
-    from functools import wraps
-    def __init__(self, timeout):
+    # from telegram.ext import Job
+    # from functools import wraps
+    def __init__(self, timeout, action):
         self.timeout = timeout
-    def __call__(self, fn, *args, **kwargs):
+    def __call__(self, fn):
+        log.debug('FUNC {} WAS CALLED'.format(fn))
+        timeout = self.timeout
+        @wraps(fn)
+        def decorated(self, *args, **kwargs):
+            log.debug('FUNC {} WAS DECORATED'.format(fn))
+            telegram_job = job_decorator(self)(fn, *args, **kwargs)
+            self.job_queue.put(Job(telegram_job, timeout, repeat=False))
+            log.debug('PUTTED ARGS {}'.format([self, args, kwargs]))
+        return decorated
         # jobwrap = job_decorator()
-        def selfer(_self, *args, **kwargs):
-            log.debug('PUTTED ARGS {}'.format([_self, args, kwargs]))
-            fn(_self, *args, **kwargs)
-        return fn(*args, **kwargs)
-    
+        # return fn(*args, **kwargs)
 
 class ClassBasedDecoratorWithParams(object):
     
@@ -60,7 +65,6 @@ def job(timeout, action):
         @wraps(func)
         def argswrap(self, *args, **kwargs):
             telegram_job = job_decorator(self)(func, *args, **kwargs)
-            log.debug('PUTTED ARGS {}'.format([self, args, kwargs]))
             self.job_queue.put(Job(telegram_job, timeout, repeat=False))
         return argswrap
     return decorator
@@ -107,6 +111,7 @@ class TelegramTrigger(BaseTrigger):
     def send_action(self, action):
         return self.bot.send_chat_action(chat_id=self.chat_id, action=action)
 
+
     # @send_action(TYPING)
     @allowjob(TYPING)
     def send_msg(self, txt):
@@ -151,7 +156,7 @@ class TelegramTrigger(BaseTrigger):
                 action = getattr(func, 'action')
                 self.bot.send_chat_action(chat_id=self.chat_id, action=action)
                 # decorate function
-                func = job(timeout, action)(func)
+                func = putjob(timeout, action)(func)
                 setattr(self, attr, types.MethodType(func, self))
                 # log.debug('DECORATE {}, ACTION {}, TIMEOUT {}, DECORATED {}'.format(attr, action, timeout,func))
         return self
