@@ -17,6 +17,21 @@ from functools import wraps
 
 TYPING, UPLOAD_PHOTO = (ChatAction.TYPING, ChatAction.UPLOAD_PHOTO)
 
+class JobTimeout(object):
+    def __init__(self, timeout, latency):
+        self.timeout = timeout
+        self.latency = latency
+        if timeout < 0:
+            self.timeout = abs(timeout)
+            log.error('TIMEOUT MUST BE A POSITIVE!')
+        if latency:
+            if timeout < latency:
+                self.latency = 0
+                log.error('TIMEOUT MUST BE A BIGGER THAN LATENCY YOU PASSED {} < {}!'.format(timeout, latency))
+            if latency < 0:
+                log.error('LATENCY MUST BE POSITIVE!')
+            self.latency = self.timeout - abs(latency)
+
 class job_decorator(object):
     def __init__(self, trigger):
         self.trigger = trigger
@@ -28,60 +43,25 @@ class job_decorator(object):
             return fn(*args, **kwargs)
         return telegram_job
 
-class putjob(object):
-    # from telegram.ext import Job
-    # from functools import wraps
-    def __init__(self, timeout, action_latency):
-        self.timeout = timeout
-        self.latency = action_latency
-    def __call__(self, fn):
-        log.debug('FUNC {} WAS CALLED'.format(fn.__name__))
-        timeout = self.timeout
-        latency = self.latency
-        @wraps(fn)
-        def decorated(self, *args, **kwargs):
-            log.debug('FUNC {} WAS DECORATED'.format(fn.__name__))
-            send_action_job = job_decorator(self)(self.bot.send_chat_action, chat_id=self.chat_id, action=fn.action)
-            self.job_queue.put(Job(send_action_job, timeout - latency, repeat=False))
-            # log.debug('SEND ACTION FOR {} WITH TIMEOUT {}'.format(fn.__name__, timeout))
-            # self.bot.send_chat_action(chat_id=self.chat_id, action=fn.action)
-            telegram_job = job_decorator(self)(fn, *args, **kwargs)
-            self.job_queue.put(Job(telegram_job, timeout, repeat=False))
-            log.debug('PUTTED ARGS {}'.format([self, args, kwargs]))
-        return decorated
-        # jobwrap = job_decorator()
-        # return fn(*args, **kwargs)
-
-class ClassBasedDecoratorWithParams(object):
-    
+class allowjob(object):
     def __init__(self, action):
-        # self.timeout = timeout
-        self.action = action        
+        self.action = action
 
-    def __call__(self, fn, *args, **kwargs):
-        def new_func(*args, **kwargs):
-            # print "Function has been decorated.  Congratulations."
-            return fn(*args, **kwargs)
-        return new_func
-
-def job(timeout, action):
-    from telegram.ext import Job
-    from functools import wraps
-    def decorator(func):
+    def __call__(self, func):
+        action = self.action
         @wraps(func)
-        def argswrap(self, *args, **kwargs):
-            telegram_job = job_decorator(self)(func, *args, **kwargs)
-            self.job_queue.put(Job(telegram_job, timeout, repeat=False))
-        return argswrap
-    return decorator
-
-def allowjob(action):
-    def wrap(func):
-        setattr(func, 'action', action)
-        return func
-    return wrap
-
-
+        def decorator(self, *args, **kwargs):
+            if hasattr(self, 'job'):
+                log.debug('FOND TIMEOUT ATTR LET\'S PUT FUNC {} TO JOB_QUEUE'.format(func.__name__))
+                if self.job.latency != None:
+                    send_action_job = job_decorator(self)(self.bot.send_chat_action, chat_id=self.chat_id, action=action)
+                    self.job_queue.put(Job(send_action_job, self.job.latency, repeat=False))
+                telegram_job = job_decorator(self)(func, self, *args, **kwargs)
+                self.job_queue.put(Job(telegram_job, self.job.timeout, repeat=False))
+            else:
+                return func(self, *args, **kwargs)
+                log.debug('FOND TIMEOUT ARGS LET\'S PUT TO JOIN QUEUE FUNC: {}'.format(func.__name__))
+        return decorator
 
 class TelegramTrigger(BaseTrigger):
     
@@ -147,25 +127,20 @@ class TelegramTrigger(BaseTrigger):
         return self.bot.sendPhoto(chat_id=self.chat_id, photo=src)
 
     # @classmethod
-    def putjob(self, timeout, latency=1, **kwargs):
-        # enumeration trigger functions
-        testcls = self.__class__()
-        testcls.update = self.update
-        testcls.bot = self.bot
-        testcls.job_queue = self.job_queue
-        self = testcls
-        for attr in dir(self):
-            log.debug('GET {}'.format(attr))
-            func = getattr(self, attr)
-            # if function has action attr decorate them
-            if callable(func) and hasattr(func, 'action'):
-                action = getattr(func, 'action')
-                # self.bot.send_chat_action(chat_id=self.chat_id, action=action)
-                # decorate function
-                func = putjob(timeout, latency)(func)
-                setattr(self, attr, types.MethodType(func, self))
-                # log.debug('DECORATE {}, ACTION {}, TIMEOUT {}, DECORATED {}'.format(attr, action, timeout,func))
+    def putjob(self, timeout, latency=1.5, **kwargs):
+        # create copy of trigger if timeout passed
+        if timeout is None:
+            log.error('TIMEOUST IS NONE SKIP..')
+        else:
+            # new_trigger = self.__class__()
+            # new_trigger.update = self.update
+            # new_trigger.bot = self.bot
+            # new_trigger.job_queue = self.job_queue
+            # new_trigger.job = JobTimeout(timeout, latency)
+            # self = new_trigger
+            self.job = JobTimeout(timeout, latency)
         return self
+        
 
         # def put_job(self, timeout, action=None):
         #     def job_wrap(bot, job):
