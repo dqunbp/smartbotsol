@@ -17,6 +17,3 @@ python:
 - 3.3
 - 2.7
 script: tox
-branches:
-  only:
-  - master
