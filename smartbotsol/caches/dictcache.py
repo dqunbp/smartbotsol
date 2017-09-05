@@ -1,10 +1,11 @@
 from smartbotsol import Cache
 from smartbotsol import User
+from smartbotsol.core.cache import _log
 
 import os, dill, sys
 import errno
-import logging as logger
-log = logger.getLogger(__name__)
+import logging
+log = logging.getLogger(__name__)
 
 class DictCache(Cache):
     """Users cache store based on dictonary"""
@@ -12,7 +13,8 @@ class DictCache(Cache):
     _cache = {}
     FILE_NAME = 'bot.pkl'
     BACKUP_DIR_PATH = '~/states_backup'
-
+    
+    @_log
     def get(self, uid):
         return self._cache.setdefault(uid, User(uid))
 
@@ -21,7 +23,7 @@ class DictCache(Cache):
             assert isinstance(value, User)
         except AssertionError as e:
             log.warn(e)
-            log.warn('User with id %s, is %s instance, it must be User instance, skip...' % (k, v.__class__.__name__))
+            log.warn('User with id %s, is %s instance, it must be User instance, skip...' % (key, value.__class__.__name__))
         self._cache[key] = value
 
     def to_dict(self):
