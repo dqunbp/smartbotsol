@@ -14,6 +14,9 @@ class DictCache(Cache):
     FILE_NAME = 'bot.pkl'
     BACKUP_DIR_PATH = '~/states_backup'
     
+    def __str__(self):
+        return str(self._cache)
+    
     @_log
     def get(self, uid):
         return self._cache.setdefault(uid, User(uid))
