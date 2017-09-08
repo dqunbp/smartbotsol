@@ -13,27 +13,34 @@ class DictCache(Cache):
     FILE_NAME = 'bot.pkl'
     BACKUP_DIR_PATH = '~/states_backup'
 
+    def __init__(self, newdict=None):
+        if newdict:
+            self._cache.update(newdict)
+
     def get(self, uid):
         return self._cache.setdefault(uid, User(uid))
 
     def add(self, key, value):
         try:
             assert isinstance(value, User)
+            self._cache[key] = value
         except AssertionError as e:
             log.warn(e)
-            log.warn('User with id %s, is %s instance, it must be User instance, skip...' % (k, v.__class__.__name__))
-        self._cache[key] = value
+            log.warn('User with id %s, is %s instance, it must be User instance, skip...' % (key, value.__class__.__name__))
 
     def to_dict(self):
         return self._cache
 
-    def from_dict(self, fdict):
+    @classmethod
+    def from_dict(cls, fdict):
         assert isinstance(fdict, dict)
+        cache = cls()
         for k,v in fdict.iteritems():
             if not k == v.uid:
                 log.warn('User id must be equals store key %s != %s, skip...' % (k, v.uid))
                 continue
-            self.add(k,v)
+            cache.add(k,v)
+        return cache
 
     def save(self):
         """Save users cache to file"""
