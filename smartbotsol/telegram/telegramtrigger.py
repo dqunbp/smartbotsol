@@ -107,7 +107,6 @@ class TelegramTrigger(BaseTrigger):
     def send_photo(self, src):
         return self.bot.sendPhoto(chat_id=self.chat_id, photo=src)
 
-    # will call 'get_chat_id' when accessing like obj.chat_id
     chat_id = property(get_chat_id)
     txt = property(get_txt)
     name = property(get_name)
