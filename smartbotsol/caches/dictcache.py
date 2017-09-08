@@ -1,10 +1,11 @@
 from smartbotsol import Cache
 from smartbotsol import User
+from smartbotsol.core.cache import _log
 
 import os, dill, sys
 import errno
-import logging as logger
-log = logger.getLogger(__name__)
+import logging
+log = logging.getLogger(__name__)
 
 class DictCache(Cache):
     """Users cache store based on dictonary"""
