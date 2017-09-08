@@ -35,7 +35,7 @@ class DictCache(Cache):
     def from_dict(cls, fdict):
         assert isinstance(fdict, dict)
         cache = cls()
-        for k,v in fdict.iteritems():
+        for k,v in fdict.items():
             if not k == v.uid:
                 log.warn('User id must be equals store key %s != %s, skip...' % (k, v.uid))
                 continue
