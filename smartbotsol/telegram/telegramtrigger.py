@@ -37,7 +37,7 @@ class TelegramTrigger(BaseTrigger):
     def get_chat_id(self):
         return self.update.message.chat_id if self.update else None
 
-    def get_txt(self):
+    def get_text(self):
         return self.update.message.text if self.update else None
 
     def get_name(self):
@@ -65,7 +65,7 @@ class TelegramTrigger(BaseTrigger):
             address=address
         )
 
-    def send_message(self, txt, remove_keyboard=False, **kwargs):
+    def send_message(self, text, remove_keyboard=False, **kwargs):
         """Sends telegram message"""
         message_kwargs = self.default_message_kwargs.copy()
         message_kwargs.update(**kwargs)
@@ -76,11 +76,11 @@ class TelegramTrigger(BaseTrigger):
             )
         return self.bot.sendMessage(
             chat_id=self.chat_id,
-            text=txt,
+            text=text,
             **message_kwargs
         )
 
-    def send_keyboard(self, txt, keyboard, inline=False,**kwargs):
+    def send_keyboard(self, text, keyboard, inline=False,**kwargs):
         """Sends telegram message with keyboard"""
         message_kwargs = self.default_message_kwargs.copy()
         markup_kwargs = self.default_markup_kwargs.copy()
@@ -99,7 +99,7 @@ class TelegramTrigger(BaseTrigger):
             )
         return self.bot.sendMessage(
             chat_id=self.chat_id,
-            text=txt,
+            text=text,
             reply_markup=reply_markup,
             **message_kwargs
         )
@@ -108,7 +108,7 @@ class TelegramTrigger(BaseTrigger):
         return self.bot.sendPhoto(chat_id=self.chat_id, photo=src)
 
     chat_id = property(get_chat_id)
-    txt = property(get_txt)
+    text = property(get_text)
     name = property(get_name)
     phone = property(get_phone)
     venue = property(get_venue)
