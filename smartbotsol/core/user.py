@@ -11,6 +11,9 @@ class User(object):
             return True
         return False
 
+    def __str__(self):
+        return 'User[uid: {}; state: {}; lang: {}]'.format(self.uid, self.state, self.lang)
+
     def to_dict(self):
         data = dict()
 

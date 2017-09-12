@@ -3,8 +3,9 @@ from smartbotsol import User
 
 import os, dill, sys
 import errno
-import logging as logger
-log = logger.getLogger(__name__)
+import logging
+from smartbotsol.core.cache import _log
+log = logging.getLogger(__name__)
 
 class DictCache(Cache):
     """Users cache store based on dictonary"""
@@ -17,6 +18,7 @@ class DictCache(Cache):
         if newdict:
             self._cache.update(newdict)
 
+    @_log
     def get(self, uid):
         return self._cache.setdefault(uid, User(uid))
 

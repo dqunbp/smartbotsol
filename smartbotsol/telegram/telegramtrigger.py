@@ -2,7 +2,7 @@
 
 import telegram
 import os
-import logging as log
+import logging
 from smartbotsol.telegram.utils.helpers import send_action
 from telegram.chataction import ChatAction
 from smartbotsol.telegram.utils.helpers import transform_keyboard_to_inline
@@ -11,6 +11,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRe
 from smartbotsol import BaseTrigger
 
 TYPING, UPLOAD_PHOTO = (ChatAction.TYPING, ChatAction.UPLOAD_PHOTO)
+log = logging.getLogger(__name__)
 
 class TelegramTrigger(BaseTrigger):
     """Wrap for telegram bot update"""
