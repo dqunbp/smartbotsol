@@ -6,6 +6,9 @@ class User(object):
         self.state = None
         self.lang = 'ru'
 
+    def __hash__(self):
+        return hash(self.uid)
+
     def __eq__(self, other):
         if self.uid == other.uid:
             return True
