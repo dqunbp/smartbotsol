@@ -85,10 +85,13 @@ class TelegramTrigger(BaseTrigger):
         """Sends telegram message with keyboard"""
         message_kwargs = self.default_message_kwargs.copy()
         markup_kwargs = self.default_markup_kwargs.copy()
-        message_kwargs.update(**kwargs)
+        message_kwargs.update(
+            {k: v for k,v in kwargs.items() if k in self.default_message_kwargs}
+        )
         markup_kwargs.update(
             {k: v for k,v in kwargs.items() if k in self.default_markup_kwargs}
         )
+        
         reply_markup = telegram.ReplyKeyboardMarkup(
             keyboard=keyboard,
             **markup_kwargs
