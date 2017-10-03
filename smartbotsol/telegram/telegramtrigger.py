@@ -35,29 +35,29 @@ class TelegramTrigger(BaseTrigger):
     def __str__(self):
         return str((self.user, self.bot, self.update))
 
-    def get_chat_id(self):
+    def _get_chat_id(self):
         return self.update.message.chat_id if self.update else None
 
-    def get_text(self):
+    def _get_text(self):
         return self.update.message.text if self.update else None
 
-    def get_name(self):
+    def _get_name(self):
         user = self.update.message.from_user
         return user.first_name if user.first_name else user.username
 
-    def get_phone(self):
+    def _get_phone(self):
         user = self.update.message
         return user.contact.phone_number if user.contact else None
 
-    def get_location(self):
+    def _get_location(self):
         return self.update.message.location if self.update.message.location else None
 
-    def get_venue(self):
+    def _get_venue(self):
         return self.update.message.venue if self.update.message.venue else None
 
     def send_venue(self, title, address, location):
         """Sends telegram location"""
-        assert isinstance(locals, list)
+        assert isinstance(location, list)
         return self.bot.sendVenue(
             chat_id=self.chat_id,
             latitude=location[0],
@@ -91,7 +91,7 @@ class TelegramTrigger(BaseTrigger):
         markup_kwargs.update(
             {k: v for k,v in kwargs.items() if k in self.default_markup_kwargs}
         )
-        
+
         reply_markup = telegram.ReplyKeyboardMarkup(
             keyboard=keyboard,
             **markup_kwargs
@@ -111,9 +111,9 @@ class TelegramTrigger(BaseTrigger):
     def send_photo(self, src):
         return self.bot.sendPhoto(chat_id=self.chat_id, photo=src)
 
-    chat_id = property(get_chat_id)
-    text = property(get_text)
-    name = property(get_name)
-    phone = property(get_phone)
-    venue = property(get_venue)
-    location = property(get_location)
+    chat_id = property(_get_chat_id)
+    text = property(_get_text)
+    name = property(_get_name)
+    phone = property(_get_phone)
+    venue = property(_get_venue)
+    location = property(_get_location)
