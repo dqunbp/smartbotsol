@@ -13,24 +13,47 @@ from smartbotsol import BaseTrigger
 TYPING, UPLOAD_PHOTO = (ChatAction.TYPING, ChatAction.UPLOAD_PHOTO)
 log = logging.getLogger(__name__)
 
+class DefaultKwargs(object):
+    
+    _default_kwargs = {}
+    
+    def __init__(self, **kwargs):
+        self._default_kwargs.update(**kwargs)
+
+    def __get__(self, obj, obj_type=None):
+        return self._default_kwargs.copy().update(
+            {k: v for k,v in self._default_kwargs.items() if k in self._default_kwargs}
+        )
+
+    def __set__(self, obj, value):
+        isinstance(value, dict)
+        self._new_kwargs = value
+
+class MessageKwargs(DefaultKwargs):
+    
+    _default_kwargs = {
+        'parse_mode': telegram.ParseMode.MARKDOWN,
+        'disable_web_page_preview': True,
+        'disable_notification': True
+    }
+    
+class MarkupKwargs(DefaultKwargs):
+    
+    _default_kwargs = {
+            'resize_keyboard': True,
+            'one_time_keyboard': False,
+        }
+
 class TelegramTrigger(BaseTrigger):
     """Wrap for telegram bot update"""
 
+    default_message_kwargs = MessageKwargs()
+    default_markup_kwargs = MarkupKwargs()
 
     def __init__(self):
         self.user = None
         self.bot = None
         self.update = None
-        
-        self.default_message_kwargs = {
-            'parse_mode': telegram.ParseMode.MARKDOWN,
-            'disable_web_page_preview': True,
-            'disable_notification': True
-        }
-        self.default_markup_kwargs = {
-            'resize_keyboard': True,
-            'one_time_keyboard': False,
-        }
 
     def __str__(self):
         return str((self.user, self.bot, self.update))
@@ -68,44 +91,37 @@ class TelegramTrigger(BaseTrigger):
 
     def send_message(self, text, remove_keyboard=False, **kwargs):
         """Sends telegram message"""
-        message_kwargs = self.default_message_kwargs.copy()
-        message_kwargs.update(**kwargs)
+        self.default_markup_kwargs = kwargs
+        reply_markup = None
         if remove_keyboard:
-            message_kwargs.setdefault(
-                'reply_markup',
-                ReplyKeyboardRemove()
-            )
+            reply_markup = ReplyKeyboardRemove()
+        
         return self.bot.sendMessage(
             chat_id=self.chat_id,
             text=text,
-            **message_kwargs
+            reply_markup = reply_markup,
+            **self.default_markup_kwargs
         )
 
-    def send_keyboard(self, text, keyboard, inline=False,**kwargs):
+    def send_keyboard(self, text, keyboard, inline=False, **kwargs):
         """Sends telegram message with keyboard"""
-        message_kwargs = self.default_message_kwargs.copy()
-        markup_kwargs = self.default_markup_kwargs.copy()
-        message_kwargs.update(
-            {k: v for k,v in kwargs.items() if k in self.default_message_kwargs}
-        )
-        markup_kwargs.update(
-            {k: v for k,v in kwargs.items() if k in self.default_markup_kwargs}
-        )
-
+        self.default_message_kwargs = kwargs
+        self.default_markup_kwargs = kwargs
+        
         reply_markup = telegram.ReplyKeyboardMarkup(
             keyboard=keyboard,
-            **markup_kwargs
+            **self.default_markup_kwargs
         )
         if inline:
             reply_markup = InlineKeyboardMarkup(
                 transform_keyboard_to_inline(keyboard),
-                **markup_kwargs
+                **self.default_markup_kwargs
             )
         return self.bot.sendMessage(
             chat_id=self.chat_id,
             text=text,
             reply_markup=reply_markup,
-            **message_kwargs
+            **self.default_message_kwargs
         )
 
     def send_photo(self, src):
