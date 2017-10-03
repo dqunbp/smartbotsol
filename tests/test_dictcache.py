@@ -35,8 +35,12 @@ class TestSmartbotsol(unittest.TestCase):
 
     def test_to_dict(self):
         """Test something."""
-        cache = DictCache()
-        self.assertTrue(isinstance(cache.to_dict(), dict))
-        for u in self.users_uids:
-            cache.get(u)
+        cache = DictCache(self.dict_cache)
+        # self.assertTrue(isinstance(cache.to_dict(), dict))
         self.assertDictEqual(cache.to_dict(), self.dict_cache)
+
+
+    def test_from_dict(self):
+        cache = DictCache.from_dict(self.dict_cache)
+        self.assertTrue(isinstance(cache._cache, dict))
+        self.assertDictEqual(cache._cache, self.dict_cache)

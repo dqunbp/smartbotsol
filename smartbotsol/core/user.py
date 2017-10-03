@@ -6,10 +6,16 @@ class User(object):
         self.state = None
         self.lang = 'ru'
 
+    def __hash__(self):
+        return hash(self.uid)
+
     def __eq__(self, other):
         if self.uid == other.uid:
             return True
         return False
+
+    def __str__(self):
+        return 'User[uid: {}; state: {}; lang: {}]'.format(self.uid, self.state, self.lang)
 
     def to_dict(self):
         data = dict()
