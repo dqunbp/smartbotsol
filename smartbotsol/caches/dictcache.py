@@ -5,6 +5,7 @@ from smartbotsol.core.cache import _log
 import os, dill, sys
 import errno
 import logging
+from smartbotsol.core.cache import _log
 log = logging.getLogger(__name__)
 
 class DictCache(Cache):
@@ -17,6 +18,11 @@ class DictCache(Cache):
     def __str__(self):
         return str(self._cache)
     
+
+    def __init__(self, newdict=None):
+        if newdict:
+            self._cache.update(newdict)
+
     @_log
     def get(self, uid):
         return self._cache.setdefault(uid, User(uid))
@@ -24,21 +30,24 @@ class DictCache(Cache):
     def add(self, key, value):
         try:
             assert isinstance(value, User)
+            self._cache[key] = value
         except AssertionError as e:
             log.warn(e)
             log.warn('User with id %s, is %s instance, it must be User instance, skip...' % (key, value.__class__.__name__))
-        self._cache[key] = value
 
     def to_dict(self):
         return self._cache
 
-    def from_dict(self, fdict):
+    @classmethod
+    def from_dict(cls, fdict):
         assert isinstance(fdict, dict)
-        for k,v in fdict.iteritems():
-            if not k == v.uid:
-                log.warn('User id must be equals store key %s != %s, skip...' % (k, v.uid))
-                continue
-            self.add(k,v)
+        cache = cls()
+        for k,v in fdict.items():
+            # if not k == v.uid:
+            #     log.warn('User id must be equals store key %s != %s, skip...' % (k, v.uid))
+            #     continue
+            cache.add(k,v)
+        return cache
 
     def save(self):
         """Save users cache to file"""
