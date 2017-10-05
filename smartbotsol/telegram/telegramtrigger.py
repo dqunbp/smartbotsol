@@ -20,14 +20,15 @@ class DefaultKwargs(object):
     def __init__(self, **kwargs):
         self._default_kwargs.update(**kwargs)
 
-    def __get__(self, obj, obj_type=None):
+    @property
+    def values(self):    
         return self._default_kwargs.copy().update(
-            {k: v for k,v in self._default_kwargs.items() if k in self._default_kwargs}
-        )
+            {k: v for k,v in self._new_kwargs.items() if k in self._default_kwargs}
+        ) if hasattr(self, '_new_kwargs') else self._default_kwargs
 
-    def __set__(self, obj, value):
+    def update(self, value):
         isinstance(value, dict)
-        self._new_kwargs = value
+        self._new_kwargs = value.copy()
 
 class MessageKwargs(DefaultKwargs):
     
@@ -91,7 +92,7 @@ class TelegramTrigger(BaseTrigger):
 
     def send_message(self, text, remove_keyboard=False, **kwargs):
         """Sends telegram message"""
-        self.default_markup_kwargs = kwargs
+        self.default_message_kwargs.update(**kwargs)
         reply_markup = None
         if remove_keyboard:
             reply_markup = ReplyKeyboardRemove()
@@ -100,28 +101,28 @@ class TelegramTrigger(BaseTrigger):
             chat_id=self.chat_id,
             text=text,
             reply_markup = reply_markup,
-            **self.default_markup_kwargs
+            **self.default_message_kwargs.values
         )
 
     def send_keyboard(self, text, keyboard, inline=False, **kwargs):
         """Sends telegram message with keyboard"""
-        self.default_message_kwargs = kwargs
-        self.default_markup_kwargs = kwargs
+        self.default_message_kwargs.update(**kwargs)
+        self.default_markup_kwargs.update(**kwargs)
         
         reply_markup = telegram.ReplyKeyboardMarkup(
             keyboard=keyboard,
-            **self.default_markup_kwargs
+            **self.default_markup_kwargs.values
         )
         if inline:
             reply_markup = InlineKeyboardMarkup(
                 transform_keyboard_to_inline(keyboard),
-                **self.default_markup_kwargs
+                **self.default_markup_kwargs.values
             )
         return self.bot.sendMessage(
             chat_id=self.chat_id,
             text=text,
             reply_markup=reply_markup,
-            **self.default_message_kwargs
+            **self.default_message_kwargs.values
         )
 
     def send_photo(self, src):
