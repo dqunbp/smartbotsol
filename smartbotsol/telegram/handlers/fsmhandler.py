@@ -36,4 +36,4 @@ class FsmTelegramHandler(Handler):
         trigger.user = user
         trigger.update = update
         
-        self.state_machine.fire(trigger)
+        dispatcher.run_async(self.state_machine.fire, trigger)
