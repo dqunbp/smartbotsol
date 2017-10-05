@@ -9,7 +9,7 @@ from smartbotsol.telegram.utils.helpers import transform_keyboard_to_inline
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 
 from smartbotsol import BaseTrigger
-
+import pdb
 TYPING, UPLOAD_PHOTO = (ChatAction.TYPING, ChatAction.UPLOAD_PHOTO)
 log = logging.getLogger(__name__)
 
@@ -21,14 +21,17 @@ class DefaultKwargs(object):
         self._default_kwargs.update(**kwargs)
 
     @property
-    def values(self):    
-        return self._default_kwargs.copy().update(
-            {k: v for k,v in self._new_kwargs.items() if k in self._default_kwargs}
-        ) if hasattr(self, '_new_kwargs') else self._default_kwargs
+    def values(self):
+        kwargs_copy = self._default_kwargs.copy()
+        if hasattr(self, '_new_kwargs'):
+            kwargs_copy.update(
+                {k: v for k,v in self._new_kwargs.items() if k in self._default_kwargs}
+            )
+        return kwargs_copy
 
-    def update(self, value):
-        isinstance(value, dict)
-        self._new_kwargs = value.copy()
+    def update(self, **kwargs):
+        isinstance(kwargs, dict)
+        self._new_kwargs = kwargs.copy()
 
 class MessageKwargs(DefaultKwargs):
     
