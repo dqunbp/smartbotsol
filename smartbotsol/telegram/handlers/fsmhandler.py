@@ -11,10 +11,10 @@ from smartbotsol import DictCache
 
 class FsmTelegramHandler(Handler):
 
-    def __init__(self, state_machine, users_cache=DictCache(), trigger=TelegramTrigger()):
-        self.users_cache = users_cache
+    def __init__(self, state_machine, users_cache=None, trigger=None):
+        self.users_cache = users_cache or DictCache()
+        self.trigger = trigger or TelegramTrigger()
         self.state_machine = state_machine
-        self.trigger = trigger
 
     def set_users_cache(self, store):
         pass
