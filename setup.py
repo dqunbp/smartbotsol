@@ -15,6 +15,7 @@ requirements = [
     # TODO: put package requirements here
     'python-telegram-bot==7.0.1',
     'dill',
+    'tinydb',
 ]
 
 setup_requirements = [
