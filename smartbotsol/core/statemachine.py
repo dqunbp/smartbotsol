@@ -26,6 +26,7 @@ class StateMachine(object):
         new_state = self.state._on_trigger(trigger)
         self.to_state(new_state, trigger)
         trigger.user.state = self.state
+        return self.state
 
     def to_state(self, new_state, trigger):
         if not new_state:

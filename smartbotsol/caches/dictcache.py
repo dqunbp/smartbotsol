@@ -27,6 +27,9 @@ class DictCache(Cache):
     def get(self, uid):
         return self._cache.setdefault(uid, User(uid))
 
+    def set(self, uid, state):
+        self._cache[uid] = User(uid, state)
+
     def add(self, key, value):
         try:
             assert isinstance(value, User)

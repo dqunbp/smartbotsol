@@ -11,6 +11,9 @@ class Cache(object):
     def get(self, parameter):
         raise NotImplementedError
 
+    def set(self, parameter):
+        raise NotImplementedError
+
     def add(self, key, value):
         raise NotImplementedError
 

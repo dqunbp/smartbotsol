@@ -1,9 +1,9 @@
 from smartbotsol import BaseState
 
 class User(object):
-    def __init__(self, uid):
+    def __init__(self, uid, state=None):
         self.uid = uid
-        self.state = None
+        self.state = state
         self.lang = 'ru'
 
     def __hash__(self):
