@@ -1,5 +1,5 @@
 from smartbotsol import BaseState
-
+# TODO Try add descriptor for memcache 
 class User(object):
     def __init__(self, uid):
         self.uid = uid

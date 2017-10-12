@@ -24,6 +24,7 @@ class DefaultKwargs(object):
     def values(self):
         kwargs_copy = self._default_kwargs.copy()
         if hasattr(self, '_new_kwargs'):
+            # TODO Try use map/filter
             kwargs_copy.update(
                 {k: v for k,v in self._new_kwargs.items() if k in self._default_kwargs}
             )
@@ -34,7 +35,7 @@ class DefaultKwargs(object):
         self._new_kwargs = kwargs.copy()
 
 class MessageKwargs(DefaultKwargs):
-    
+    # TODO Add all default kwargs
     _default_kwargs = {
         'parse_mode': telegram.ParseMode.MARKDOWN,
         'disable_web_page_preview': True,
@@ -42,7 +43,7 @@ class MessageKwargs(DefaultKwargs):
     }
     
 class MarkupKwargs(DefaultKwargs):
-    
+    # TODO Add all default kwargs
     _default_kwargs = {
             'resize_keyboard': True,
             'one_time_keyboard': False,

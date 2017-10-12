@@ -11,10 +11,11 @@ from smartbotsol import DictCache
 
 class FsmTelegramHandler(Handler):
 
-    def __init__(self, state_machine, users_cache=None, trigger=None):
+    def __init__(self, state_machine, async=False, users_cache=None, trigger=None):
         self.users_cache = users_cache or DictCache()
         self.trigger = trigger or TelegramTrigger()
         self.state_machine = state_machine
+        self.async = async
 
     def set_users_cache(self, store):
         pass
@@ -36,4 +37,7 @@ class FsmTelegramHandler(Handler):
         trigger.user = user
         trigger.update = update
         
-        dispatcher.run_async(self.state_machine.fire, trigger)
+        if self.async:
+            dispatcher.run_async(self.state_machine.fire, trigger)
+        else:
+            self.state_machine.fire(trigger)
