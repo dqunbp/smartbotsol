@@ -31,7 +31,7 @@ class DefaultKwargs(object):
         return kwargs_copy
 
     def update(self, **kwargs):
-        isinstance(kwargs, dict)
+        assert isinstance(kwargs, dict)
         self._new_kwargs = kwargs.copy()
 
 class MessageKwargs(DefaultKwargs):
