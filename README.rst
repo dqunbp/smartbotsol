@@ -25,10 +25,55 @@ smart conversation bots package
 * Documentation: https://smartbotsol.readthedocs.io.
 
 
-Features
---------
+Getting started
+----------------
+1. Describe yor states
+2. Create `server.py`:
 
-* TODO
+    .. code-block:: python
+
+        from telegram.ext import Updater
+        from smartbotsol import StateMachine
+        from smartbotsol.telegram import FsmTelegramHandler
+
+        logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+        log = logging.getLogger(__name__)
+
+        from states import BootStrapState
+
+        handler = FsmTelegramHandler(
+            StateMachine(
+                BootStrapState(),
+                filters=[]
+            )
+        )
+
+        def create_bot():
+            token = os.environ.get('TELEGRAM_TOKEN')
+            port = int(os.environ.get('PORT', '5000'))
+            updater = Updater(token)
+            updater.dispatcher.add_handler(handler)            
+            return updater
+
+        def start_polling_bot():
+            bot = create_bot()
+            bot.start_polling(read_latency=50.0)
+            return bot
+
+        if __name__ == '__main__':
+            start_polling_bot()
+
+For async runs pass `async=True`: 
+
+    .. code-block:: python
+
+        handler = FsmTelegramHandler(
+            StateMachine(
+                BootStrapState(),
+                filters=[]
+            ),
+            async=True
+        )
 
 Credits
 ---------
