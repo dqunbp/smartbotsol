@@ -36,6 +36,7 @@ Getting started
         from smartbotsol import StateMachine
         from smartbotsol.telegram import FsmTelegramHandler
 
+        import logging
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
         log = logging.getLogger(__name__)
 
