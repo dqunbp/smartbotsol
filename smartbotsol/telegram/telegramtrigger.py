@@ -35,18 +35,20 @@ class DefaultKwargs(object):
         self._new_kwargs = kwargs.copy()
 
 class MessageKwargs(DefaultKwargs):
-    # TODO Add all default kwargs
     _default_kwargs = {
         'parse_mode': telegram.ParseMode.MARKDOWN,
         'disable_web_page_preview': True,
-        'disable_notification': True
+        'disable_notification': True,
+        'reply_to_message_id': None,
+        'reply_markup': None,
+        'timeout': None,
     }
     
 class MarkupKwargs(DefaultKwargs):
-    # TODO Add all default kwargs
     _default_kwargs = {
             'resize_keyboard': True,
             'one_time_keyboard': False,
+            'selective': False,
         }
 
 class TelegramTrigger(BaseTrigger):
@@ -128,7 +130,7 @@ class TelegramTrigger(BaseTrigger):
             reply_markup=reply_markup,
             **self.default_message_kwargs.values
         )
-
+    
     def send_photo(self, src):
         return self.bot.sendPhoto(chat_id=self.chat_id, photo=src)
 
