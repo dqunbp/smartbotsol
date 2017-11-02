@@ -10,6 +10,6 @@ from .caches.dictcache import DictCache
 
 __author__ = """Tigran Grigoryan"""
 __email__ = 'dqunbp@gmail.com'
-__version__ = '0.1.0'
+__version__ = '1.0.0'
 
 __all__ = ['StateMachine', 'Filter', 'BaseState', 'BaseTrigger', 'User', 'Cache', 'DictCache']
