@@ -29,7 +29,7 @@ packages = find_packages(exclude=['tests*'])
 
 setup(
     name='smartbotsol',
-    version='0.1.0',
+    version='1.0.0',
     description="smart conversation bots package",
     long_description=readme + '\n\n' + history,
     author="Tigran Grigoryan",
